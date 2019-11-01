@@ -1,11 +1,11 @@
 {
-  "client_id": "",
-  "redirect_uri": "",
-  "end_session_redirect_uri": "",
+  "client_id": "0oao6w17wcNBvbhsA0h7",
+  "redirect_uri": "com.okta.android.samples.browsersignin:/callback",
+  "end_session_redirect_uri": "com.okta.android.samples.browsersignin:/logout",
   "scopes": [
     "openid",
     "profile",
-    "offline_access",
+    "offline_access"
   ],
-  "discovery_uri": ""
+  "discovery_uri" : "https://dev-232593.oktapreview.com/oauth2/default"
 }

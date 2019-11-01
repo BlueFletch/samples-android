@@ -14,7 +14,7 @@ if (project.rootProject.file('local.properties').exists()) {
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.okta.android.samples.browser_sign_in"
+        applicationId "com.okta.android.samples.browsersignin"
         minSdkVersion 19
         targetSdkVersion 28
         versionCode 1
@@ -22,7 +22,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         manifestPlaceholders = [
-                "appAuthRedirectScheme": "{redirect_uri_schema}"
+                "appAuthRedirectScheme": "com.okta.android.samples.browsersignin"
         ]
 
         if (username != null && password != null) {
