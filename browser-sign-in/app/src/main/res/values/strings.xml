@@ -26,6 +26,7 @@
     <string name="locale_title">Locale:</string>
     <string name="zoneinfo_title">Zone Info:</string>
     <string name="refresh_token_btn">Refresh token</string>
+    <string name="refresh_user_btn">Get User</string>
     <string name="access_token_btn">Access token</string>
     <string name="id_token_btn">IdToken</string>
     <string name="clear_data">Clear data</string>

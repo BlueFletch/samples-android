@@ -15,6 +15,7 @@
 package com.okta.android.samples.browser_sign_in;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -24,12 +25,6 @@ import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.okta.android.samples.browser_sign_in.util.OktaProgressDialog;
 import com.okta.android.samples.browser_sign_in.util.PreferenceRepository;
@@ -50,6 +45,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.concurrent.atomic.AtomicReference;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import static com.okta.oidc.util.AuthorizationException.EncryptionErrors;
 
@@ -87,7 +88,7 @@ public class UserInfoActivity extends AppCompatActivity {
         mSessionClient = mWebAuthClient.getSessionClient();
 
         if (!getSessionClient().isAuthenticated()) {
-            showMessage(getString(R.string.not_authorized));
+            showMessageError(getString(R.string.not_authorized));
             clearData();
             finish();
             return;
@@ -126,6 +127,12 @@ public class UserInfoActivity extends AppCompatActivity {
         findViewById(R.id.refresh_token).setOnClickListener(v ->
                 refreshToken()
         );
+        findViewById(R.id.refresh_user).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fetchUserInfo();
+            }
+        });
 
         findViewById(R.id.refresh_token).setVisibility(View.VISIBLE);
         findViewById(R.id.refreshtoken_title).setVisibility(View.VISIBLE);
@@ -144,7 +151,7 @@ public class UserInfoActivity extends AppCompatActivity {
 
             @Override
             public void onError(@Nullable String s, @Nullable AuthorizationException e) {
-                showMessage(getString(R.string.error_message) + " : " + e.errorDescription + " : " + e.error);
+                showMessageError(getString(R.string.error_message) + " : " + e.errorDescription + " : " + e.error);
                 handleEncryptionError(e, () -> logOut());
             }
         }, this);
@@ -153,7 +160,7 @@ public class UserInfoActivity extends AppCompatActivity {
             try {
                 mUserInfoJson.set(new UserInfo(new JSONObject(savedInstanceState.getString(KEY_USER_INFO))));
             } catch (JSONException ex) {
-                showMessage("JSONException: " + ex);
+                showMessageError("JSONException: " + ex);
                 Log.e(TAG, Log.getStackTraceString(ex));
             }
         }
@@ -194,7 +201,7 @@ public class UserInfoActivity extends AppCompatActivity {
                 }, mEncryptionManager.getCipher());
                 break;
             case EncryptionErrors.INVALID_KEYS_ERROR:
-                showMessage("Failure fetch user profile: " + e.error + ":" + e.errorDescription);
+                showMessageError("Failure fetch user profile: " + e.error + ":" + e.errorDescription);
                 handleInvalidKeys();
                 break;
         }
@@ -224,7 +231,7 @@ public class UserInfoActivity extends AppCompatActivity {
                 }, mEncryptionManager.getCipher());
             }
         } else {
-            showMessage("No authorization state retained - re-authorization required");
+            showMessageError("No authorization state retained - re-authorization required");
             navigateToStartActivity();
             finish();
         }
@@ -233,7 +240,7 @@ public class UserInfoActivity extends AppCompatActivity {
 
     private void showDialogWithAllowToProtectDataByFingerprint() {
         if (!SmartLockHelper.isKeyguardSecure(this)) {
-            showMessage(getString(R.string.setup_lockscreen_info_msg));
+            showMessageError(getString(R.string.setup_lockscreen_info_msg));
             showSmartLockInfo();
             return;
         }
@@ -266,7 +273,7 @@ public class UserInfoActivity extends AppCompatActivity {
                 @Override
                 public void onFingerprintError(String error) {
                     super.onFingerprintError(error);
-                    showMessage(error);
+                    showMessageError(error);
                     showSmartLockInfo();
                     oktaProgressDialog.hide();
                 }
@@ -302,7 +309,7 @@ public class UserInfoActivity extends AppCompatActivity {
             public void onError(String s, AuthorizationException e) {
                 oktaProgressDialog.hide();
                 mUserInfoJson.set(null);
-                showMessage("Failure fetch user profile: " + e.error + ":" + e.errorDescription);
+                showMessageError("Failure fetch user profile: " + e.error + ":" + e.errorDescription);
                 handleEncryptionError(e, () -> fetchUserInfo());
             }
         });
@@ -322,7 +329,7 @@ public class UserInfoActivity extends AppCompatActivity {
             @Override
             public void onError(String s, AuthorizationException e) {
                 oktaProgressDialog.hide();
-                showMessage(getString(R.string.error_message) + " : " + e.errorDescription + " : " + e.error);
+                showMessageError(getString(R.string.error_message) + " : " + e.errorDescription + " : " + e.error);
                 handleEncryptionError(e, () -> refreshToken());
             }
         });
@@ -406,7 +413,7 @@ public class UserInfoActivity extends AppCompatActivity {
             getWebAuthClient().migrateTo(simpleEncryptionManager);
             mPreferenceRepository.enableSmartLock(false);
         } catch (Exception e) {
-            showMessage(e.getMessage());
+            showMessageError(e.getMessage());
         }
         navigateToStartActivity();
     }
@@ -459,7 +466,7 @@ public class UserInfoActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             Log.e(TAG, Log.getStackTraceString(e));
-            showMessage(e.getMessage());
+            showMessageError(e.getMessage());
         }
     }
 
@@ -487,7 +494,25 @@ public class UserInfoActivity extends AppCompatActivity {
     }
 
     private void showMessage(String message) {
+
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void showMessageError(String message) {
+
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle("Error")
+                .setMessage(message)
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     @Override

@@ -1,11 +1,29 @@
 {
-  "client_id": "",
-  "redirect_uri": "",
-  "end_session_redirect_uri": "",
+  "client_id": "0oakm067x00Bc6rk30h7",
+  "redirect_uri": "com.bluefletch.launcher:/callback",
+  "end_session_redirect_uri": "com.bluefletch.launcher:/callback",
   "scopes": [
     "openid",
     "profile",
     "offline_access"
   ],
-  "discovery_uri": ""
+  "discovery_uri" : "https://dev-232593.oktapreview.com/",
+
+  "okta": {
+    "client_id": "0oao6w17wcNBvbhsA0h7",
+    "redirect_uri": "com.okta.android.samples.browsersignin:/callback",
+    "end_session_redirect_uri": "com.okta.android.samples.browsersignin:/callback",
+    "scopes": [
+      "openid",
+      "profile",
+      "offline_access"
+    ],
+    "discovery_uri" : "https://dev-232593.oktapreview.com/"
+  },
+  "launcher": {
+    "okta_issuer_uri" : "https://dev-232593.oktapreview.com/",
+    "okta_client_id" : "0oakm067x00Bc6rk30h7",
+    "okta_redirect_uri" : "com.bluefletch.launcher:/callback",
+    "okta_scopes" : "[\"openid\", \"profile\", \"offline_access\"]"
+  }
 }
